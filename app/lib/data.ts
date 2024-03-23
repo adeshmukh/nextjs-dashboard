@@ -7,6 +7,8 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
+  Invoice,
+  FormattedCustomersTable,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
@@ -89,7 +91,12 @@ export async function fetchInvoiceStatusPopping(): Promise<[string, string]> {
   ];
 }
 
-export async function fetchCardData() {
+export async function fetchCardData(): Promise<{
+  numberOfCustomers: number,
+  numberOfInvoices: number,
+  totalPaidInvoices: string,
+  totalPendingInvoices: string,
+}> {
   noStore();
 
   console.log('Fetching cards data...');
@@ -133,7 +140,7 @@ const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
-) {
+): Promise<InvoicesTable[]> {
   noStore();
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
@@ -166,7 +173,7 @@ export async function fetchFilteredInvoices(
   }
 }
 
-export async function fetchInvoicesPages(query: string) {
+export async function fetchInvoicesPages(query: string): Promise<number> {
   noStore();
   try {
     const count = await sql`SELECT COUNT(*)
@@ -188,7 +195,7 @@ export async function fetchInvoicesPages(query: string) {
   }
 }
 
-export async function fetchInvoiceById(id: string) {
+export async function fetchInvoiceById(id: string): Promise<Omit<Invoice, 'date'>> {
   noStore();
   try {
     const data = await sql<InvoiceForm>`
@@ -214,7 +221,7 @@ export async function fetchInvoiceById(id: string) {
   }
 }
 
-export async function fetchCustomers() {
+export async function fetchCustomers(): Promise<CustomerField[]> {
   noStore();
   try {
     const data = await sql<CustomerField>`
@@ -233,7 +240,7 @@ export async function fetchCustomers() {
   }
 }
 
-export async function fetchFilteredCustomers(query: string) {
+export async function fetchFilteredCustomers(query: string): Promise<FormattedCustomersTable[]> {
   noStore();
   try {
     const data = await sql<CustomersTableType>`
@@ -267,7 +274,7 @@ export async function fetchFilteredCustomers(query: string) {
   }
 }
 
-export async function getUser(email: string) {
+export async function getUser(email: string): Promise<User> {
   noStore();
   try {
     const user = await sql`SELECT * FROM users WHERE email=${email}`;
