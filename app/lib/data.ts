@@ -196,7 +196,7 @@ export async function fetchInvoicesPages(query: string): Promise<number> {
 
 export async function fetchInvoiceById(
   id: string,
-): Promise<Omit<Invoice, 'date'> | boolean> {
+): Promise<Omit<Invoice, 'date'> | false> {
   noStore();
   try {
     const data = await sql<InvoiceForm>`
