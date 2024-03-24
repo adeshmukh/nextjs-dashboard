@@ -13,7 +13,6 @@ import {
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
 
-
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
@@ -92,10 +91,10 @@ export async function fetchInvoiceStatusPopping(): Promise<[string, string]> {
 }
 
 export async function fetchCardData(): Promise<{
-  numberOfCustomers: number,
-  numberOfInvoices: number,
-  totalPaidInvoices: string,
-  totalPendingInvoices: string,
+  numberOfCustomers: number;
+  numberOfInvoices: number;
+  totalPaidInvoices: string;
+  totalPendingInvoices: string;
 }> {
   noStore();
 
@@ -195,7 +194,9 @@ export async function fetchInvoicesPages(query: string): Promise<number> {
   }
 }
 
-export async function fetchInvoiceById(id: string): Promise<Omit<Invoice, 'date'>> {
+export async function fetchInvoiceById(
+  id: string,
+): Promise<Omit<Invoice, 'date'> | boolean> {
   noStore();
   try {
     const data = await sql<InvoiceForm>`
@@ -214,7 +215,7 @@ export async function fetchInvoiceById(id: string): Promise<Omit<Invoice, 'date'
       amount: invoice.amount / 100,
     }));
 
-    return invoice[0];
+    return invoice ? invoice[0] : false;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
@@ -240,7 +241,9 @@ export async function fetchCustomers(): Promise<CustomerField[]> {
   }
 }
 
-export async function fetchFilteredCustomers(query: string): Promise<FormattedCustomersTable[]> {
+export async function fetchFilteredCustomers(
+  query: string,
+): Promise<FormattedCustomersTable[]> {
   noStore();
   try {
     const data = await sql<CustomersTableType>`
